@@ -3,27 +3,66 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title>My Dashboard</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
 </head>
 <body>
 
     <form>
         <input type=text size=5 >
-        <a href=# id=process_input><button class='btn btn-default'>Submit</button></a>
+        <a href=fetchGraphJsonData() id=process_input><button class='btn btn-default'>Submit</button></a>
     </form>
 
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
     <div class="container">
         <div class="row">
             <div class="col-md-6">
                 <div class="chart" id="bargraph">
-                    <script>
-                        var graphs = {{plot | safe}};
-                        Plotly.plot('bargraph',graphs,{});
-                    </script>
                 </div>
             </div>
         </div>
     </div>
+
+
+    <script>
+        // Once Dom is created & elements are rendered then show plot.
+
+        function plotGraph(jsonData){
+            // update the plot, .react is recommended for updating existing plot as it's more efficient than .newPlot
+            Plotly.react("bargraph", jsonData);
+        }
+
+        function fetchGraphJsonData(){
+            console.log("sending request to server");
+            
+            // jQuery.get( url [, data ] [, success ] [, dataType ] )
+            $.get({url:"http://127.0.0.1:5000/fetchGraphJsonData",
+                          data:null, 
+                          success:function(response){
+                              console.log("response received from server");
+                              plotGraph(response); console.log("ploting graph");
+                             }, dataType:"json"});
+        }
+
+      
+        Plotly.newPlot("bargraph"); // Calling Plotly.plot as if redrawing but this container doesn't yet have a plot
+        fetchGraphJsonData(); // inital page load graph
+
+        //setInterval(fetchGraphJsonData, 5000); // update every 5 seconds 
+
+
+        // Understand promise concepts <- Javascript
+
+        // fetch('http://127.0.0.1:5000/fetchGraphJsonData')
+        // .then(response => response.json())
+        // .then(function(jsonData){
+        //     console.log(jsonData);
+        //     plotGraph(jsonData);
+        // }());
+
+
+    </script>
+
 </body>
 </html>

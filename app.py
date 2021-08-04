@@ -3,6 +3,8 @@ import plotly.graph_objs as go
 
 import pandas as pd
 import numpy as np
+# best practice is to use https://flask.palletsprojects.com/en/2.0.x/api/#flask.json.jsonify
+
 import json
 
 
@@ -12,8 +14,9 @@ from flask import Flask, render_template
 app = Flask(__name__)
 
 
+@app.route('/fetchGraphJsonData')
 def create_plot():
-
+    # http://127.0.0.1:5000/fetchGraphJsonData
 
     N = 40
     x = np.linspace(0, 1, N)
@@ -35,9 +38,7 @@ def create_plot():
 
 @app.route('/')
 def index():
-
-    bar = create_plot()
-    return render_template('index.html', plot=bar)
+    return render_template('index.html')
 
 
 
