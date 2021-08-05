@@ -1,29 +1,53 @@
 <!DOCTYPE html>
 <html>
+
 <head lang="en">
     <meta charset="UTF-8">
     <title>My Dashboard</title>
+    <!-- imported jQuery: $ -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
 
 </head>
-<body>
 
-    <form>
-        <input type=text size=5 >
-        <a href=fetchGraphJsonData() id=process_input><button class='btn btn-default'>Submit</button></a>
-    </form>
+<body style="padding: 3%; background-color: rgba(241, 247, 248, 0.433);">
+ 
 
-    <div class="container">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="chart" id="bargraph">
-                </div>
-            </div>
-        </div>
+    <input type=text size=5 id=user_input>
+
+    <p id="ticker"></p>
+
+    <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
     </div>
+    
+    
+    <div class="card shadow bg-white rounded-1" style="border: none;">
+        <div class="card-header" style="background-color: white; border:none">
+            <p style="font-weight: bold; font-size: large;">
+            <img id="refreshBtn" src="https://img.icons8.com/ios-glyphs/30/000000/refresh--v2.png" onclick="fetchGraphJsonData()"/>
+            Graph 1
+            </p>
+        </div> <!--CARD HEADER-->
+        <div class="card-body">
+            <div class="chart" id="bargraph"></div>           
+        </div> <!--CARD BODY-->
+    </div>          
 
+    </br>
+    <div class="card shadow bg-white rounded-1" style="border: none">
+        <div class="card-header" style="background-color: white; border: none;">
+            <p style="font-weight: bold; font-size: large;">
+            <img id="refreshBtn" src="https://img.icons8.com/ios-glyphs/30/000000/refresh--v2.png" onclick="fetchGraphTwo()"/>
+            Graph 2
+        </p>
+        </div> <!--CARD HEADER-->
+        <div class="card-body">
+            <div class="SignalChart" id="SignalChart" style="padding-right: 4%;">
+        </div> <!--CARD BODY-->
+    </div>
 
     <script>
         // Once Dom is created & elements are rendered then show plot.
@@ -34,8 +58,13 @@
         }
 
         function fetchGraphJsonData(){
-            console.log("sending request to server");
+            console.log("sending request 1 to server");
             
+            test = document.getElementById('user_input');
+            console.log(test.value)
+            $("#ticker").text(test.value);
+
+
             // jQuery.get( url [, data ] [, success ] [, dataType ] )
             $.get({url:"http://127.0.0.1:5000/fetchGraphJsonData",
                           data:null, 
@@ -45,11 +74,31 @@
                              }, dataType:"json"});
         }
 
-      
-        Plotly.newPlot("bargraph"); // Calling Plotly.plot as if redrawing but this container doesn't yet have a plot
-        fetchGraphJsonData(); // inital page load graph
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        function plotGraphTwo(jsonData){
+            // update the plot, .react is recommended for updating existing plot as it's more efficient than .newPlot
+            Plotly.react("SignalChart", jsonData);
+        }
 
-        //setInterval(fetchGraphJsonData, 5000); // update every 5 seconds 
+        function fetchGraphTwo(){
+            console.log("sending request 2 to server");
+            
+       
+            // jQuery.get( url [, data ] [, success ] [, dataType ] )
+            $.get({url:"http://127.0.0.1:5000/fetchGraph",
+                          data:null, 
+                          success:function(response){
+                              console.log("response received from server");
+                              plotGraphTwo(response); console.log("ploting graph");
+                             }, dataType:"json"});
+        }
+    
+
+        fetchGraphJsonData(); // inital page load graph
+        fetchGraphTwo(); // inital page load graph 2
+
+
+        // setInterval(fetchGraphJsonData, 5000); // update every 5 seconds 
 
 
         // Understand promise concepts <- Javascript
@@ -63,6 +112,8 @@
 
 
     </script>
-
 </body>
 </html>
+
+
+<!--<a href="https://icons8.com/icon/tovbiOioOGAO/refresh">Refresh icon by Icons8</a>-->
