@@ -6,18 +6,29 @@ import numpy as np
 # best practice is to use https://flask.palletsprojects.com/en/2.0.x/api/#flask.json.jsonify
 from utils.db_manage import QuRetType, std_db_acc_obj
 
-import json
+import json, time
 
 
 from flask import Flask, render_template, request
 
 
 app = Flask(__name__)
+
+@app.route('/api/mockDelay')
+def mock_delay():
+    delay_sec = 5
+    time.sleep(delay_sec)
+    return json.dumps({"text": f"This is a dummy response, server took: {delay_sec} seconds to respond."})
+
+
 db_acc_obj = std_db_acc_obj() 
-
-
-@app.route('/fetchGraph')
+@app.route('/api/fetchSignalChartJsonData')
 def makeLinesSignal(tick='AXR'):
+    # http://127.0.0.1:5000/api/fetchSignalChartJsonData
+
+    tick = request.args["tick"]
+    print(f"tick recieved: {tick}")
+    # You can have tick validation before moving ahead, if it's invalid tick then return error on UI
 
     qu = f"SELECT t.*,t2.Gap FROM\
     (SELECT * FROM signals.Signals_details\
@@ -139,11 +150,12 @@ def makeLinesSignal(tick='AXR'):
     print(graphJSON)
 
     return graphJSON
+    # return {}
 
 
-@app.route('/fetchGraphJsonData')
+@app.route('/api/fetchBarGraphJsonData')
 def create_plot():
-    # http://127.0.0.1:5000/fetchGraphJsonData
+    # http://127.0.0.1:5000/api/fetchBarGraphJsonData
 
     N = 40
     x = np.linspace(0, 1, N)
@@ -165,7 +177,6 @@ def create_plot():
 
 @app.route('/')
 def index():
-
     return render_template('index.html')
 
 
